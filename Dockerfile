@@ -1,20 +1,10 @@
-FROM node:6.5.0
-
-# Create app directory
-RUN mkdir -p /app
+FROM node:current
 WORKDIR /app
-
-# Bundle app source
-COPY . /app
+COPY package.json /app
 RUN npm install
-
-# Mount persistent storage
-VOLUME /app/data
-VOLUME /app/public/uploads
-
-# Add the environment variable
-# to copy files rather than use symlinks
-ENV APOS_ALWAYS_COPY_ASSETS=1
-
+RUN npm install -g nodemon
+COPY . /app
 EXPOSE 3000
-CMD [ "npm", "start" ]
+CMD [ "./scripts/wait-for-it.sh", "mongo:27017", "--", "nodemon", "--legacy-watch", "server.js" ]
+
+

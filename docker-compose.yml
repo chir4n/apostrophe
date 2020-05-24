@@ -1,30 +1,24 @@
-version: '3'
-
+version: "2"
 services:
-  mongo:
-    image: 'mongo:latest'
-    volumes:
-      - 'mongo:/data/db'
-    ports:
-      - '127.0.0.1:27017:27017'
+  apostrophe:
+    container_name: apostrophe
     restart: always
-
-  aposcms:
-    image: "aposDockerImageFileName:latest"
+    build: .
     ports:
-      - '3000:3000'
-    volumes:
-      - /app/data:/app/data
-      - /app/public/uploads:/app/public/uploads
+      - "3000:3000"
     links:
-      - mongo:mongo
+      - mongo
+    volumes:
+      - ./data/uploads:/app/public/uploads
+      - ./lib:/app/lib
+    environment:
+      - APOS_MONGODB_URI=mongodb://mongo:27017/db
     depends_on:
       - mongo
-    environment:
-      MONGODB_PORT_27017_TCP_ADDR: 'mongodb://mongo'
-      MONGODB_PORT_27017_TCP_PORT: '27017'
-      APOS_ALWAYS_COPY_ASSETS: '1'
-    restart: always
-
-volumes:
+#    command: nodemon --watch lib -e js,html server.js
   mongo:
+    container_name: mongo
+    image: mongo
+    restart: always
+    expose:
+      - "27017"
